@@ -114,6 +114,7 @@ export interface UserAccount {
   id: string;
   name: string;
   email: string;
+  username?: string;
   password: string;
   role: 'Admin' | 'Manager' | 'Standard';
   lastLogin?: string;

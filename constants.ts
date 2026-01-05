@@ -43,10 +43,22 @@ export const MOCK_ACCOUNTS: UserAccount[] = [
     id: '1',
     name: 'Admin Kullanıcı',
     email: 'admin@hantech.com',
-    password: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+    username: 'admin',
+    password: 'admin123',
     role: 'Admin',
     lastLogin: new Date().toISOString(),
     title: 'Sistem Yöneticisi',
     phone: '+90 555 000 00 00'
+  },
+  {
+    id: '2',
+    name: 'Tunahan Yılmaztürk',
+    email: 'tunahanyilmazturk@gmail.com',
+    username: 'tunahan',
+    password: '123456',
+    role: 'Admin',
+    lastLogin: new Date().toISOString(),
+    title: 'Yönetici',
+    phone: '+90 555 111 22 33'
   }
 ];

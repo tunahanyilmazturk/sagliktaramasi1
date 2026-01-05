@@ -49,6 +49,7 @@ const UserManagement: React.FC = () => {
                     id: Math.random().toString(36).substr(2, 9),
                     name: editingUser.name || '',
                     email: editingUser.email || '',
+                    username: editingUser.username || '',
                     password: hashedPassword,
                     role: editingUser.role || 'Standard',
                     lastLogin: new Date().toISOString()
@@ -285,6 +286,19 @@ const UserManagement: React.FC = () => {
                                 placeholder="Ahmet Yılmaz"
                                 value={editingUser.name || ''}
                                 onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="group">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block group-focus-within:text-blue-500 transition-colors">Kullanıcı Adı</label>
+                        <div className="relative">
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" size={18} />
+                            <input
+                                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 py-3 pl-12 pr-4 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium"
+                                placeholder="kullanici_adi"
+                                value={editingUser.username || ''}
+                                onChange={(e) => setEditingUser({ ...editingUser, username: e.target.value })}
                             />
                         </div>
                     </div>

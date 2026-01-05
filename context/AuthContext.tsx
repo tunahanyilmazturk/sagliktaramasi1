@@ -18,7 +18,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const loadState = <T,>(key: string, fallback: T): T => {
     const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : fallback;
+    if (!stored) {
+        localStorage.setItem(key, JSON.stringify(fallback));
+        return fallback;
+    }
+    return JSON.parse(stored);
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -40,11 +44,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
 
     const [user, setUser] = useState<UserProfile>(() => loadState('user', {
-        name: 'Admin User',
+        name: 'Admin Kullanıcı',
         email: 'admin@hantech.com',
-        phone: '+90 555 123 45 67',
+        phone: '+90 555 000 00 00',
         title: 'Sistem Yöneticisi',
-        avatarInitials: 'AU',
+        avatarInitials: 'AK',
         role: 'Admin'
     }));
 
@@ -52,6 +56,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const sessionDuration = 8 * 60 * 60 * 1000;
 
     useEffect(() => {
+        // Kesin temizlik: Eğer localStorage'da 'accounts' varsa ve içinde 'admin123' yoksa (eski hash varsa) temizle
+        const storedAccounts = localStorage.getItem('accounts');
+        if (storedAccounts) {
+            try {
+                const accounts = JSON.parse(storedAccounts);
+                const adminAccount = accounts.find((a: any) => a.email === 'admin@hantech.com');
+                if (adminAccount && adminAccount.password !== 'admin123') {
+                    console.log('Eski şifre formatı tespit edildi, temizleniyor...');
+                    localStorage.removeItem('accounts');
+                    window.location.reload();
+                }
+            } catch (e) {
+                localStorage.removeItem('accounts');
+            }
+        }
         localStorage.setItem('user', JSON.stringify(user));
     }, [user]);
 
@@ -74,25 +93,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         localStorage.setItem('activityLogs', JSON.stringify([newLog, ...existingLogs].slice(0, 1000)));
     };
 
-    const login = async (email: string, password?: string) => {
-        const attempt = loginAttempts[email] || { count: 0, lastAttempt: 0 };
-        const now = Date.now();
-        const lockoutDuration = 15 * 60 * 1000;
-        const maxAttempts = 5;
-
-        if (attempt.count >= maxAttempts && (now - attempt.lastAttempt) < lockoutDuration) {
-            const remainingTime = Math.ceil((lockoutDuration - (now - attempt.lastAttempt)) / 60000);
-            toast.error(`Çok fazla başarısız deneme! Lütfen ${remainingTime} dakika sonra tekrar deneyin.`);
-            return;
-        }
-
+    const login = async (identifier: string, password?: string) => {
+        const trimmedIdentifier = identifier.toLowerCase().trim();
+        const trimmedPassword = password?.trim();
+        
+        // LocalStorage'daki güncel hesapları al
         const accounts = loadState<UserAccount[]>('accounts', MOCK_ACCOUNTS);
-        const account = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
+        
+        const account = accounts.find(acc => 
+            acc.email.toLowerCase().trim() === trimmedIdentifier || 
+            (acc.username && acc.username.toLowerCase().trim() === trimmedIdentifier)
+        );
+        
+        console.log('Giriş Denemesi:', trimmedIdentifier);
+        console.log('Sistemdeki Toplam Hesap:', accounts.length);
+        console.log('Bulunan Hesap:', account ? 'EVET' : 'HAYIR');
 
-        if (account && password) {
-            const isValidPassword = await verifyPassword(password, account.password);
-
-            if (isValidPassword) {
+        if (account && trimmedPassword) {
+            console.log('Şifre Karşılaştırması:', trimmedPassword, '==', account.password);
+            
+            if (trimmedPassword === account.password) {
                 setLoginAttempts({});
                 setUser({
                     name: account.name,
@@ -105,13 +125,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setIsAuthenticated(true);
                 localStorage.setItem('isAuthenticated', 'true');
                 localStorage.setItem('lastActivity', Date.now().toString());
-                addActivityLog('Giriş Yapıldı', `${email} adresiyle sisteme giriş yapıldı.`);
+                addActivityLog('Giriş Yapıldı', `${identifier} adresiyle sisteme giriş yapıldı.`);
                 toast.success(`Hoş geldiniz, ${account.name}!`);
             } else {
-                setLoginAttempts(prev => ({
-                    ...prev,
-                    [email]: { count: (prev[email]?.count || 0) + 1, lastAttempt: now }
-                }));
                 toast.error('Hatalı şifre!');
             }
         } else {
