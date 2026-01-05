@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HanTech Yönetim Paneli</title>
+    <link rel="icon" href="/logo.png" type="image/png">
+    <link rel="stylesheet" href="/index.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PDFMake Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              primary: {
+                DEFAULT: '#2563EB', // Kurumsal Mavi
+                50: '#eff6ff',
+                100: '#dbeafe',
+                500: '#3b82f6',
+                600: '#2563EB',
+                700: '#1d4ed8',
+              },
+              secondary: {
+                DEFAULT: '#0F172A', // Koyu Lacivert
+                900: '#0F172A',
+                800: '#1e293b',
+              },
+              slate: {
+                50: '#F8FAFC', // Background
+                100: '#F1F5F9',
+                200: '#E2E8F0', // Border
+                300: '#cbd5e1',
+                400: '#94a3b8',
+                500: '#64748B', // Muted Text
+                600: '#475569',
+                700: '#334155',
+                800: '#1e293b',
+                900: '#0f172a',
+                950: '#020617',
+              }
+            },
+            animation: {
+              'fade-in-up': 'fadeInUp 0.5s ease-out',
+              'scale-in': 'scaleIn 0.2s ease-out',
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              scaleIn: {
+                '0%': { opacity: '0', transform: 'scale(0.95)' },
+                '100%': { opacity: '1', transform: 'scale(1)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style type="text/tailwindcss">
+      @layer base {
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+          @apply bg-transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          @apply bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors;
+        }
+
+        /* Selection Color */
+        ::selection {
+          @apply bg-blue-500/20 text-blue-700 dark:text-blue-300;
+        }
+
+        body {
+          @apply bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 ease-in-out antialiased;
+          font-family: 'Inter', sans-serif;
+        }
+      }
+
+      @layer components {
+        .card {
+          @apply bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 transition-all duration-300;
+        }
+        .card-hover {
+          @apply hover:shadow-xl hover:shadow-blue-500/5 dark:hover:shadow-blue-900/10 hover:-translate-y-1 transition-all duration-300;
+        }
+        .card-header {
+          @apply text-lg font-bold text-slate-800 dark:text-white mb-4 transition-colors duration-300;
+        }
+        .btn {
+          @apply px-4 py-2.5 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+        .btn-primary {
+          @apply bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20 border border-transparent hover:shadow-blue-600/30;
+        }
+        .btn-secondary {
+          @apply bg-slate-800 dark:bg-slate-700 text-white hover:bg-slate-700 dark:hover:bg-slate-600 border border-transparent shadow-lg shadow-slate-900/10;
+        }
+        .btn-outline {
+          @apply border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 bg-white dark:bg-transparent hover:border-slate-300 dark:hover:border-slate-600 shadow-sm;
+        }
+        .btn-danger {
+          @apply bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 hover:border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/30 dark:hover:bg-red-900/40;
+        }
+        .input {
+          @apply w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 bg-white dark:bg-slate-900 dark:text-white transition-all duration-300 placeholder:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm;
+        }
+        .label {
+          @apply text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block transition-colors duration-300;
+        }
+        /* Custom Pill Filter Button */
+        .filter-pill {
+          @apply px-4 py-2 rounded-full text-xs font-bold transition-all border cursor-pointer select-none;
+        }
+        .filter-pill-active {
+          @apply bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/25;
+        }
+        .filter-pill-inactive {
+          @apply bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600;
+        }
+      }
+    </style>
+    <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "recharts": "https://esm.sh/recharts@^3.6.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react-hot-toast": "https://esm.sh/react-hot-toast@^2.6.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom": "https://esm.sh/react-dom@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "xlsx": "https://esm.sh/xlsx@0.18.5"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
